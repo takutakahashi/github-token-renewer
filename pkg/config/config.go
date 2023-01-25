@@ -3,6 +3,7 @@ package config
 type Config struct {
 	URL            string
 	PrivateKeyPath string
+	AppID          int64
 	Output         Output
 }
 
