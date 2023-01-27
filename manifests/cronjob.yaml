@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: github-token-renewer
+spec:
+  schedule: "0 */5 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          volumes:
+          - name: config
+            configMap:
+              name: github-token-renewer-config
+          - name: private-key
+            secret:
+              name: github-app-private-key
+          containers:
+          - name: hello
+            image: ghcr.io/takutakahashi/github-token-renewer:v0.1.0
+            command:
+            - /renewer
+            - -c
+            - /etc/github-token-renewer/config.yaml
+            volumeMounts:
+            - name: config
+              mountPath: /etc/github-token-renewer
+            - name: private-key
+              mountPath: /token
+          restartPolicy: OnFailure

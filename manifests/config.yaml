@@ -1,0 +1,10 @@
+url: https://github.com
+privateKeyPath: /token/private-key.pem
+appID: 000
+installations:
+- id: 000
+  output:
+    kubernetesSecret:
+      secretName: test
+      secretNamespace: default
+      key: token
