@@ -4,9 +4,11 @@ import (
 	"context"
 
 	"github.com/takutakahashi/github-token-renewer/pkg/config"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
+	ctrl "sigs.k8s.io/controller-runtime"
 )
 
 type Kubernetes struct {
@@ -15,11 +17,7 @@ type Kubernetes struct {
 }
 
 func NewKubernetes(output config.OutputKubernetesSecret) (*Kubernetes, error) {
-	config, err := rest.InClusterConfig()
-	if err != nil {
-		return nil, err
-	}
-	clientset, err := kubernetes.NewForConfig(config)
+	clientset, err := kubernetes.NewForConfig(ctrl.GetConfigOrDie())
 	if err != nil {
 		return nil, err
 	}
@@ -30,12 +28,27 @@ func NewKubernetes(output config.OutputKubernetesSecret) (*Kubernetes, error) {
 func (k Kubernetes) Output(token string) error {
 	ctx := context.Background()
 	c := k.c.CoreV1().Secrets(k.cfg.SecretNamespace)
-	secret, err := c.Get(ctx, k.cfg.SecretName, v1.GetOptions{})
-	if err != nil {
+	secret, err := c.Get(ctx, k.cfg.SecretName, metav1.GetOptions{})
+	if errors.IsNotFound(err) {
+		secret = &v1.Secret{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      k.cfg.SecretName,
+				Namespace: k.cfg.SecretNamespace,
+			},
+			StringData: map[string]string{},
+		}
+		secret.StringData[k.cfg.Key] = token
+		if _, err := c.Create(ctx, secret, metav1.CreateOptions{}); err != nil {
+			return err
+		}
+		return nil
+
+	} else if err != nil {
 		return err
 	}
+	secret.StringData = map[string]string{}
 	secret.StringData[k.cfg.Key] = token
-	if _, err := c.Update(ctx, secret.DeepCopy(), v1.UpdateOptions{}); err != nil {
+	if _, err := c.Update(ctx, secret.DeepCopy(), metav1.UpdateOptions{}); err != nil {
 		return err
 	}
 	return nil

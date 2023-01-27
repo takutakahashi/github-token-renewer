@@ -7,10 +7,12 @@ package cmd
 import (
 	"os"
 
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/takutakahashi/github-token-renewer/pkg/config"
+	"github.com/takutakahashi/github-token-renewer/pkg/github.go"
+	"github.com/takutakahashi/github-token-renewer/pkg/output"
 )
-
-
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -24,7 +26,40 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+	Run: func(cmd *cobra.Command, args []string) {
+		cfgPath, err := cmd.Flags().GetString("config")
+		if err != nil {
+			logrus.Error(err)
+			return
+		}
+		cfg, err := config.Load(cfgPath)
+		if err != nil {
+			logrus.Error(err)
+			return
+		}
+		app, err := github.NewApp(*cfg, nil)
+		if err != nil {
+			logrus.Error(err)
+			return
+		}
+		tokenMap, err := app.GenerateInstallationToken()
+		if err != nil {
+			logrus.Error(err)
+			return
+		}
+		for installationID, token := range tokenMap {
+			in := config.GetInstallation(cfg, installationID)
+			k, err := output.NewKubernetes(*in.Output.KubernetesSecret)
+			if err != nil {
+				logrus.Error(err)
+				continue
+			}
+			if err := k.Output(token); err != nil {
+				logrus.Error(err)
+				continue
+			}
+		}
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -45,7 +80,5 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.Flags().StringP("config", "c", "./config.yaml", "Config path")
 }
-
-
