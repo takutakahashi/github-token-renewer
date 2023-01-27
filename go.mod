@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/bradleyfalzon/ghinstallation/v2 v2.1.0
 	github.com/google/go-github/v49 v49.1.0
+	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.6.1
 	k8s.io/client-go v0.26.1
 )

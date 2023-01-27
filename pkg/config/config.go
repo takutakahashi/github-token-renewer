@@ -4,7 +4,12 @@ type Config struct {
 	URL            string
 	PrivateKeyPath string
 	AppID          int64
-	Output         Output
+	Installations  []Installation
+}
+
+type Installation struct {
+	ID     int64
+	Output Output
 }
 
 type Output struct {
@@ -12,6 +17,7 @@ type Output struct {
 }
 
 type OutputKubernetesSecret struct {
-	SecretName string
-	Key        string
+	SecretName      string
+	SecretNamespace string
+	Key             string
 }
