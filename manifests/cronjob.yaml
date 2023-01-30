@@ -14,7 +14,7 @@ spec:
               name: github-token-renewer-config
           - name: private-key
             secret:
-              name: github-app-private-key
+              secretName: github-app-private-key
           containers:
           - name: renewer
             image: ghcr.io/takutakahashi/github-token-renewer:v0.1.0
@@ -25,6 +25,6 @@ spec:
             volumeMounts:
             - name: config
               mountPath: /etc/github-token-renewer
-            - name: private-key
+            - name: github-app-private-key
               mountPath: /token
           restartPolicy: OnFailure
