@@ -1,6 +1,2 @@
 resources:
 - cronjob.yaml
-configMapGenerator:
-- name: github-token-renewer-config
-  files:
-  - config.yaml
