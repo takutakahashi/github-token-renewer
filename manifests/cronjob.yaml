@@ -19,7 +19,7 @@ spec:
           - name: renewer
             image: ghcr.io/takutakahashi/github-token-renewer:v0.1.0
             command:
-            - /renewer
+            - /github-token-renewer
             - -c
             - /etc/github-token-renewer/config.yaml
             volumeMounts:
