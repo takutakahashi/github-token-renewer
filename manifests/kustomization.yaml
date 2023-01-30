@@ -1,2 +1,5 @@
+namespace: github-token-renewer
 resources:
+- namespace.yaml
 - cronjob.yaml
+- rbac.yaml

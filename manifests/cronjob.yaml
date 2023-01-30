@@ -8,6 +8,7 @@ spec:
     spec:
       template:
         spec:
+          serviceAccountName: github-token-renewer
           volumes:
           - name: config
             configMap:
