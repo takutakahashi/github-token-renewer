@@ -12,7 +12,7 @@ spec:
           - name: config
             configMap:
               name: github-token-renewer-config
-          - name: private-key
+          - name: github-app-private-key
             secret:
               secretName: github-app-private-key
           containers:
