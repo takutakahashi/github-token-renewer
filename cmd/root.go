@@ -47,11 +47,10 @@ to quickly create a Cobra application.`,
 			return
 		}
 		for installationID, token := range tokenMap {
-			ins := config.GetInstallations(cfg, installationID)
-			if ins == nil || len(ins) == 0 {
-				continue
-			}
-			for _, in := range ins {
+			for _, in := range cfg.Installations {
+				if in.ID != installationID {
+					continue
+				}
 				k, err := output.NewKubernetes(*in.Output.KubernetesSecret)
 				if err != nil {
 					logrus.Error(err)

@@ -39,16 +39,3 @@ func Load(p string) (*Config, error) {
 	}
 	return ret, nil
 }
-
-func GetInstallations(cfg *Config, id int64) []*Installation {
-	ret := []*Installation{}
-	if cfg.Installations == nil {
-		return nil
-	}
-	for _, i := range cfg.Installations {
-		if i.ID == id {
-			ret = append(ret, &i)
-		}
-	}
-	return ret
-}
