@@ -1,6 +1,5 @@
 /*
 Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
@@ -48,15 +47,21 @@ to quickly create a Cobra application.`,
 			return
 		}
 		for installationID, token := range tokenMap {
-			in := config.GetInstallation(cfg, installationID)
-			k, err := output.NewKubernetes(*in.Output.KubernetesSecret)
-			if err != nil {
-				logrus.Error(err)
+			ins := config.GetInstallations(cfg, installationID)
+			if ins == nil || len(ins) == 0 {
 				continue
 			}
-			if err := k.Output(token); err != nil {
-				logrus.Error(err)
-				continue
+			for _, in := range ins {
+				k, err := output.NewKubernetes(*in.Output.KubernetesSecret)
+				if err != nil {
+					logrus.Error(err)
+					continue
+				}
+				if err := k.Output(token); err != nil {
+					logrus.Error(err)
+					continue
+				}
+
 			}
 		}
 	},

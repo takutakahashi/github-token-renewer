@@ -40,14 +40,15 @@ func Load(p string) (*Config, error) {
 	return ret, nil
 }
 
-func GetInstallation(cfg *Config, id int64) *Installation {
+func GetInstallations(cfg *Config, id int64) []*Installation {
+	ret := []*Installation{}
 	if cfg.Installations == nil {
 		return nil
 	}
 	for _, i := range cfg.Installations {
 		if i.ID == id {
-			return &i
+			ret = append(ret, &i)
 		}
 	}
-	return nil
+	return ret
 }
