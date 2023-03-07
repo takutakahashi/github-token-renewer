@@ -18,7 +18,7 @@ spec:
               secretName: github-app-private-key
           containers:
           - name: renewer
-            image: ghcr.io/takutakahashi/github-token-renewer:v0.2.0
+            image: ghcr.io/takutakahashi/github-token-renewer:v0.3.0
             command:
             - /github-token-renewer
             - -c
