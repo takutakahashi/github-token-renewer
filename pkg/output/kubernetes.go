@@ -3,6 +3,7 @@ package output
 import (
 	"context"
 
+	"github.com/sirupsen/logrus"
 	"github.com/takutakahashi/github-token-renewer/pkg/config"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -25,8 +26,7 @@ func NewKubernetes(output config.OutputKubernetesSecret) (*Kubernetes, error) {
 	return &Kubernetes{cfg: output, c: clientset}, nil
 }
 
-func (k Kubernetes) Output(token string) error {
-	ctx := context.Background()
+func (k Kubernetes) Output(ctx context.Context, token string) error {
 	c := k.c.CoreV1().Secrets(k.cfg.SecretNamespace)
 	secret, err := c.Get(ctx, k.cfg.SecretName, metav1.GetOptions{})
 	if errors.IsNotFound(err) {
@@ -41,6 +41,7 @@ func (k Kubernetes) Output(token string) error {
 		if _, err := c.Create(ctx, secret, metav1.CreateOptions{}); err != nil {
 			return err
 		}
+		logrus.Infof("new kubernetes secret created. name: %s/%s, key: %s", secret.Namespace, secret.Name, k.cfg.Key)
 		return nil
 
 	} else if err != nil {
@@ -51,5 +52,6 @@ func (k Kubernetes) Output(token string) error {
 	if _, err := c.Update(ctx, secret.DeepCopy(), metav1.UpdateOptions{}); err != nil {
 		return err
 	}
+	logrus.Infof("kubernetes secret updated. name: %s/%s, key: %s", secret.Namespace, secret.Name, k.cfg.Key)
 	return nil
 }

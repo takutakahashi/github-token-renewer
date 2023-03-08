@@ -14,8 +14,11 @@ type Config struct {
 }
 
 type Installation struct {
-	ID     int64  `yaml:"id"`
-	Output Output `yaml:"output"`
+	ID           int64  `yaml:"id"`
+	Organization string `yaml:"organization"`
+	Repository   string `yaml:"repository"`
+	Username     string `yaml:"username"`
+	Output       Output `yaml:"output"`
 }
 
 type Output struct {

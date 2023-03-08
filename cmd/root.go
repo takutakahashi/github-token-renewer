@@ -4,12 +4,13 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"context"
 	"os"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/takutakahashi/github-token-renewer/pkg/config"
-	"github.com/takutakahashi/github-token-renewer/pkg/github.go"
+	"github.com/takutakahashi/github-token-renewer/pkg/github"
 	"github.com/takutakahashi/github-token-renewer/pkg/output"
 )
 
@@ -41,22 +42,25 @@ to quickly create a Cobra application.`,
 			logrus.Error(err)
 			return
 		}
-		tokenMap, err := app.GenerateInstallationToken()
+		ctx := context.Background()
+		tokenMap, err := app.GenerateInstallationToken(ctx)
 		if err != nil {
 			logrus.Error(err)
 			return
 		}
 		for installationID, token := range tokenMap {
 			for _, in := range cfg.Installations {
-				if in.ID != installationID {
+				id, err := app.GetInstallationID(ctx, in)
+				if err != nil || id != installationID {
 					continue
 				}
+				logrus.Infof("output started. id: %d", id)
 				k, err := output.NewKubernetes(*in.Output.KubernetesSecret)
 				if err != nil {
 					logrus.Error(err)
 					continue
 				}
-				if err := k.Output(token); err != nil {
+				if err := k.Output(ctx, token); err != nil {
 					logrus.Error(err)
 					continue
 				}
