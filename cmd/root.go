@@ -10,7 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/takutakahashi/github-token-renewer/pkg/config"
-	"github.com/takutakahashi/github-token-renewer/pkg/github.go"
+	"github.com/takutakahashi/github-token-renewer/pkg/github"
 	"github.com/takutakahashi/github-token-renewer/pkg/output"
 )
 
