@@ -18,7 +18,7 @@ spec:
                 secretName: github-app-private-key
           containers:
             - name: renewer
-              image: ghcr.io/takutakahashi/github-token-renewer:v0.3.0
+              image: ghcr.io/takutakahashi/github-token-renewer:v0.5.0
               resources:
                 requests:
                   cpu: 10m
